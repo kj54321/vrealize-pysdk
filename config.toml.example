@@ -1,0 +1,34 @@
+[default]
+title = "VRA Configuration"
+username = "user"
+password = "pass"
+
+
+[ro1]
+cloudurl = "10.248.34.44"
+createEdge = 'c4ebe570-f61d-4825-a240-45c3741455ce'
+createVM = '6e8b71ab-9ff2-498e-9886-62bc6fabf6a5'
+createNFS = '005479ad-b71f-4645-9536-fe415667c01e'
+createIPA = 'e93f6de8-4d29-4a83-9f60-57dfa2bd3907'
+createCMZ = '9fc0214c-b705-4c7a-8696-96dff5a9f68b'
+createVIP = '1225a6d5-d739-401e-a66c-18a2b1712559'
+createHDBS = '27e44193-13ec-4652-8866-f79ea9bde1b7'
+createHDBC = 'ec0e03d8-9a1f-424c-84cd-78960d22bceb'
+removeNFS = '3b4edbee-db8a-454f-a266-d7c8770f6c88'
+removeIPA = 'b6c5b0a5-a583-4b26-abbd-d03d0cc510d8'
+removeVIP = '4d2f39c6-32e3-4f20-92ab-4336b6018d55'
+
+[sy2]
+cloudurl = "10.192.34.24"
+createEdge = '2595bbda-b2d4-45de-9a6f-f9b2700aa703'
+createVM = '15b39ce3-ff00-4f37-a8b5-da8f161a6012'
+createNFS = '1aab2375-48d4-42a0-b908-1691964cc074'
+createIPA = 'a09c1436-6d54-4843-9fb6-ef21f192dbd7'
+createCMZ = 'c953b34b-2974-4e5f-901f-2377c98c2c30'
+createVIP = 'c50df85d-be3e-4921-8932-e4372154b205'
+createHDBS = '9fc490ef-cc24-40a1-ba18-59bca699b637'
+createHDBC = 'a5970a61-5a3d-47b5-bb42-a2002cf690ad'
+removeNFS = 'aa56222f-80db-4ee6-8ac7-302f8c903092'
+removeIPA = '6c019c8e-2f57-4fdc-a09a-0b338506a142'
+removeVIP = 'd74b510d-6fd9-4c2a-8f62-0ccbea965f2d'
+

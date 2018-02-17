@@ -12,7 +12,7 @@
 __author__ = 'Russell Pope'
 
 
-import json
+import json, os
 import requests
 from vralib.vraexceptions import InvalidToken
 
@@ -47,6 +47,15 @@ class Session(object):
 
     """
 
+#    if os.environ.get('VRA_PASS') is not None:
+#        envpass = os.environ['VRA_PASS']
+#    if os.environ.get('VRA_USER') is not None:
+#        envuser = os.environ['VRA_USER']
+#    if os.environ.get('VRA_URL') is not None:
+#        envurl = os.environ['VRA_URL']
+#    if os.environ.get('VRA_TENANT') is not None:
+#        envtenant = os.environ['VRA_TENANT']
+
     def __init__(self, username, cloudurl, tenant, auth_header, ssl_verify):
         """
         Initialization of the Session class.
@@ -61,6 +70,7 @@ class Session(object):
         :param auth_header: Stores the actual Bearer token to be used in subsequent requests.
         :return:
         """
+
         self.username = username
         self.cloudurl = cloudurl
         self.tenant = tenant
@@ -71,7 +81,7 @@ class Session(object):
         self.ssl_verify = ssl_verify
 
     @classmethod
-    def login(cls, username, password, cloudurl, tenant=None, ssl_verify=True):
+    def login(cls, username=None, password=None, cloudurl=None, tenant=None, ssl_verify=True):
         """
         Takes in a username, password, URL, and tenant to access a vRealize Automation server AP. These attributes
         can be used to send or retrieve data from the vRealize automation API.
@@ -90,6 +100,20 @@ class Session(object):
         :return: Returns a class that includes all of the login session data (token, tenant and SSL verification)
 
         """
+#        if not password and hasattr(cls, 'envpass'):
+#            password = Session.envpass
+#        else:
+#            print("Please input password or env VRA_PASS")
+            
+#        if not username and hasattr(cls, 'envuser'):
+#            username = Session.envuser
+#        else:
+#            print("Please input useranem or env VRA_USER")
+
+#        if not cloudurl and hasattr(cls, 'envurl'):
+#            cloudurl = Session.envurl
+#        else:
+#            print("Please input useranem or env VRA_URL")
 
         if not tenant:
             tenant = 'vsphere.local'
@@ -438,6 +462,10 @@ class Session(object):
         """
         url = 'https://' + self.cloudurl + '/catalog-service/api/consumer/requests/' + request_id + '/resourceViews'
         return self._request(url)
+    
+    def get_request_machine(self, request_id):
+        url = f"https://{self.cloudurl}/catalog-service/api/consumer/requests/{request_id}/resourceViews?$filter=(resourceType+eq+'Infrastructure.Virtual')"        
+        return self._request(url)
 
     def get_consumer_resources(self):
         """
@@ -515,7 +543,41 @@ class Session(object):
         url = f'https://{self.cloudurl}/catalog-service/api/consumer/resourceViews/{resource_id}{options}'
         return self._request(url)
 
-# TODO build blueprints
+    def get_recent_deployment(self, username):
+#        url = f"https://{self.cloudurl}/catalog-service/api/consumer/entitledCatalogItems?$filter=id eq '{catalog_id}'"
+        url = f"https://{self.cloudurl}/catalog-service/api/consumer/resources/?page=1&limit=5&$orderby=dateCreated desc&$filter=(resourceType/id eq 'composition.resource.type.deployment') and (owners/ref+eq+'{username}')"
+        return self._request(url)
+    
+    def get_resource_action_template(self, resource_id, action_id):
+        url = 'https://' + self.cloudurl + '/catalog-service/api/consumer/resources/' + resource_id + '/actions/' + action_id + '/requests/template'
+        return self._request(url)
+    
+    def request_resource_action(self, resource_id, action_id, payload=False):
+        if not payload:
+            payload = self.get_resource_action_template(resource_id, action_id)
+        url = 'https://' + self.cloudurl + '/catalog-service/api/consumer/resources/' + resource_id + '/actions/' + action_id + '/requests'
+        return self._request(url, request_method="POST", payload=payload)
+    
+    def get_resource_id(self, request_id):
+        res = self.get_request_details(request_id)
+        resourceId = res['content'][0]['resourceId']
+        return resourceId
+
+    def get_request_state(self,request_id):
+        res = self.get_requests(request_id)
+        state = res['state']
+        return state
+    
+    def get_request_vmlist(self, request_id):
+        res = self.get_request_machine(request_id)
+
+        result = []
+        for i in res['content']:
+            element = {'MachineName':i['data']['MachineName'],'ip_address':i['data']['ip_address'],'machineId':i['data']['machineId']}
+            result.append(element)
+
+        return result
+
 
 
 # TODO look into what it would take to configure a business group with endpoints, reservation, etc.
@@ -523,3 +585,24 @@ class Session(object):
 
 class CatalogItem(object):
     pass
+
+class Conf:
+  __conf = {
+    "username": "",
+    "password": "",
+    "MYSQL_PORT": 3306,
+    "MYSQL_DATABASE": 'mydb',
+    "MYSQL_DATABASE_TABLES": ['tb_users', 'tb_groups']
+  }
+  __setters = ["username", "password"]
+
+  @staticmethod
+  def config(name):
+    return Conf.__conf[name]
+
+  @staticmethod
+  def set(name, value):
+    if name in Conf.__setters:
+      Conf.__conf[name] = value
+    else:
+      raise NameError("Name not accepted in set() method")
