@@ -2,6 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.json
+build-genericVM.py
+filter-resource.py
+destory-deployment.py
+config.toml
+
 
 # C extensions
 *.so
@@ -92,3 +98,9 @@ ENV/
 
 .idea/workspace.xml
 sandbox.py
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
